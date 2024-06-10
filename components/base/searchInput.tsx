@@ -1,6 +1,7 @@
+import { X } from '@tamagui/lucide-icons';
 import React, { useEffect, useState, useRef } from 'react';
-import { TouchableWithoutFeedback, TextInput, Pressable, Keyboard } from 'react-native';
-import { XStack, Input, Paragraph, ScrollView } from 'tamagui';
+import { TextInput, Keyboard } from 'react-native';
+import { XStack, Input, Paragraph, AnimatePresence, View, Button } from 'tamagui';
 
 interface SearchInputProps {
   placeholder: string;
@@ -28,15 +29,30 @@ const SearchInput: React.FC<SearchInputProps> = ({ placeholder, onSearchChange }
   };
 
   return (
-    <XStack width="100%" ai="center" gap="$4">
+    <XStack width="100%" pos="relative" ai="center" gap="$4" paddingHorizontal="$4">
+      {showCancel && (
+        <Button
+          key="inputCancel"
+          icon={X}
+          r="$4"
+          zi={10}
+          pos="absolute"
+          backgroundColor="$colorTransparent"
+          borderColor="$colorTransparent"
+          onPress={handleCancel}
+          animation="medium"
+          enterStyle={{ opacity: 0 }}
+          exitStyle={{ opacity: 0 }}
+        />
+      )}
       <Input
-        ref={inputRef}
         f={1}
+        key="inputSearch"
+        ref={inputRef}
         value={text}
         onChangeText={setText}
         placeholder={placeholder}
       />
-      {showCancel && <Paragraph onPress={handleCancel}>Cancel</Paragraph>}
     </XStack>
   );
 };

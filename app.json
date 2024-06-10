@@ -17,7 +17,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.angelocarasig.alethia"
+      "bundleIdentifier": "com.ikarose.alethia"
     },
     "android": {
       "adaptiveIcon": {

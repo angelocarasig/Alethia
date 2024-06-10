@@ -2868,7 +2868,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tamagui/animate-presence@npm:1.100.3":
+"@tamagui/animate-presence@npm:1.100.3, @tamagui/animate-presence@npm:^1.100.3":
   version: 1.100.3
   resolution: "@tamagui/animate-presence@npm:1.100.3"
   dependencies:
@@ -4503,6 +4503,7 @@ __metadata:
     "@expo/metro-config": "npm:~0.18.4"
     "@expo/metro-runtime": "npm:~3.2.1"
     "@react-navigation/native": "npm:^6.1.17"
+    "@tamagui/animate-presence": "npm:^1.100.3"
     "@tamagui/babel-plugin": "npm:^1.100.3"
     "@tamagui/config": "npm:^1.100.3"
     "@tamagui/lucide-icons": "npm:^1.100.3"
@@ -4513,7 +4514,9 @@ __metadata:
     babel-preset-expo: "npm:^11.0.6"
     burnt: "npm:^0.12.2"
     expo: "npm:~51.0.9"
+    expo-blur: "npm:~13.0.2"
     expo-font: "npm:~12.0.6"
+    expo-linear-gradient: "npm:~13.0.2"
     expo-linking: "npm:~6.3.1"
     expo-router: "npm:~3.5.15"
     expo-splash-screen: "npm:~0.27.4"
@@ -6419,6 +6422,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-blur@npm:~13.0.2":
+  version: 13.0.2
+  resolution: "expo-blur@npm:13.0.2"
+  peerDependencies:
+    expo: "*"
+  checksum: b98260d29abf6003ada13db2c7dac10ff896935baf0bc8a4d7fe1d5a3cfcf442b3c82f191b93e8c7f84476e9e4e57706fb940b87dfce1f94025503a0fb4fd65f
+  languageName: node
+  linkType: hard
+
 "expo-constants@npm:~16.0.0":
   version: 16.0.2
   resolution: "expo-constants@npm:16.0.2"
@@ -6457,6 +6469,15 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: e9f0b066355ba776a2e60f37add779a509636dce70c6f04d24c36b436f2b69a830c2a1fe1b53eae977f2d810e93231772ccadabdd4a19f5e27cf2af3df5e8e39
+  languageName: node
+  linkType: hard
+
+"expo-linear-gradient@npm:~13.0.2":
+  version: 13.0.2
+  resolution: "expo-linear-gradient@npm:13.0.2"
+  peerDependencies:
+    expo: "*"
+  checksum: 2e05592bd9b3f156f0c5912a5cc152e80e930495d049382e4deec3103601ccc90b2e7cb5c208b51aa9d60386c5b762d40cc74cb2d1256a4605012e03d27be72a
   languageName: node
   linkType: hard
 
