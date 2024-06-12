@@ -32,6 +32,7 @@ export interface Manga {
   contentStatus: ContentStatus;
   contentRating: ContentRating;
 
+  url: string;
   /**
    * Optional URL `string` to the cover url of the manga
    */

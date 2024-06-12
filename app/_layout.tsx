@@ -1,11 +1,12 @@
-import '../tamagui-web.css'
-
-import { useEffect } from 'react'
 import { useColorScheme } from 'react-native'
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
-import { useFonts } from 'expo-font'
 import { SplashScreen, Stack } from 'expo-router'
+
+import useLoadAssets from 'hooks/useLoadAssets'
+
 import { Provider } from './Provider'
+
+import '../tamagui-web.css'
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -21,21 +22,8 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
-  const [interLoaded, interError] = useFonts({
-    Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
-    InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
-  })
-
-  useEffect(() => {
-    if (interLoaded || interError) {
-      // Hide the splash screen after the fonts have loaded (or an error was returned) and the UI is ready.
-      SplashScreen.hideAsync()
-    }
-  }, [interLoaded, interError])
-
-  if (!interLoaded && !interError) {
-    return null
-  }
+  const { isLoaded } = useLoadAssets()
+  if (!isLoaded) return null;
 
   return <RootLayoutNav />
 }
@@ -53,7 +41,6 @@ function RootLayoutNav() {
               headerShown: false,
             }}
           />
-
         </Stack>
       </ThemeProvider>
     </Provider>

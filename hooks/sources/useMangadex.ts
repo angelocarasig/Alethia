@@ -71,6 +71,7 @@ const resultToManga = (result: MangadexDataResponse | Array<MangadexDataResponse
       title: res.attributes.title.en || res.attributes.title['ja-ro'],
       author: res.relationships.find(x => x.type === 'author')?.attributes.name || '',
       artist: res.relationships.find(x => x.type === 'artist')?.attributes.name || '',
+      url: `https://mangadex.org/manga/${res.id}`,
       coverUrl: `https://mangadex.org/covers/${res.id}/${res.relationships.find(x => x.type === 'cover_art')?.attributes.fileName}${Array.isArray(result) ? '.256.jpg' : ''}`,
 
       description: Array.isArray(result) ? res.attributes.description : res.attributes.description['en'],
@@ -112,7 +113,8 @@ export function useMangadex(): SourceBase {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      cache: 'default'
     });
 
     if (!response.ok) {

@@ -18,6 +18,7 @@ module.exports = withTamagui(config, {
 })
 
 config.resolver.sourceExts.push('mjs')
+config.resolver.sourceExts.push('sql');
 
 module.exports = config
 

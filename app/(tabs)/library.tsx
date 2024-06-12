@@ -1,56 +1,52 @@
-import { useState } from 'react';
-import { FlatList, SafeAreaView, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { FlatList, SafeAreaView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { YStack } from 'tamagui';
+import { YStack, Text } from 'tamagui';
 
 import SearchInput from 'components/base/searchInput';
 import MangaCard from 'components/library/manga';
 
-import { SAMPLE_DATA } from 'lib/utils';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  columnWrapper: {
-    gap: 12
-  },
-  flatList: {
-    paddingHorizontal: 10,
-  }
-})
+import useDatabase from 'hooks/useDatabase';
 
 export default function LibraryScreen() {
-  const [filteredData, setFilteredData] = useState(SAMPLE_DATA);
+  const { library, refreshLibrary } = useDatabase();
+  const [filteredData, setFilteredData] = useState(library);
   const router = useRouter();
-  
+
+  useEffect(() => {
+    setFilteredData(library);
+  }, [library]);
+
   const handleSearch = (searchText: string) => {
-    const filtered = SAMPLE_DATA.filter(manga =>
+    const filtered = library.filter(manga =>
       manga.title.toLowerCase().includes(searchText.toLowerCase())
     );
     setFilteredData(filtered);
   };
 
   const handleCardPress = (id: string) => {
-    router.push(`/manga/${id}`);
+    router.push(`/library/${id}`);
   };
 
   return (
     <YStack f={1} ai="center" gap="$4" pt="$5">
-      <SearchInput
-        placeholder='Search Library'
-        onSearchChange={handleSearch}
-      />
-      <SafeAreaView style={styles.container}>
+      {library.length > 0 && (
+        <SearchInput
+          placeholder='Search Library'
+          onSearchChange={handleSearch}
+        />
+      )}
+      <SafeAreaView style={{ flex: 1 }}>
         <FlatList
           data={filteredData}
           renderItem={({ item }) => <MangaCard manga={item} onPress={() => handleCardPress(item.id)} />}
           keyExtractor={item => item.id}
           numColumns={3}
-          style={styles.flatList}
-          columnWrapperStyle={styles.columnWrapper}
+          style={{ paddingHorizontal: 10 }}
+          columnWrapperStyle={{ gap: 12 }}
           refreshing={false}
-          onRefresh={() => { }}
+          onRefresh={() => refreshLibrary()}
+          ListEmptyComponent={<Text>Nothing in Library!</Text>}
         />
       </SafeAreaView>
     </YStack>

@@ -1,31 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet } from 'react-native'
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { BlurView } from 'expo-blur';
 
-import { Text, YStack } from 'tamagui';
+import {
+  Text,
+  YStack,
 
-import { Manga } from 'types/manga/manga';
-import { Loader } from '@tamagui/lucide-icons';
-import { useMangadex } from 'hooks/sources/useMangadex';
+} from 'tamagui';
+
+import useDatabase from 'hooks/useDatabase';
 import MangaDetails from 'components/base/mangaDetails';
 
 const MangaStack = () => {
   const { id } = useLocalSearchParams();
-  const { loading, getManga } = useMangadex();
-  const [manga, setManga] = useState<Manga | null>(null);
+  const { getManga } = useDatabase();
+  const manga = getManga(id as string);
+
   const [blurHeader, setBlurHeader] = useState(0);
-
-  useEffect(() => {
-    getManga(id as string)
-      .then(res => setManga(res))
-  }, []);
-
-  if (loading) {
-    return (
-      <Loader />
-    )
-  }
 
   if (!manga) {
     return (
@@ -39,7 +31,7 @@ const MangaStack = () => {
     <YStack>
       <Stack.Screen
         options={{
-          headerBackTitle: "Browse",
+          headerBackTitle: "Library",
           headerBackButtonMenuEnabled: false,
           headerTitle: "",
           headerTransparent: true,

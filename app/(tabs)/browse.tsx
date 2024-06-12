@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FlatList, SafeAreaView, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { YStack } from 'tamagui';
+import { YStack, Text } from 'tamagui';
 
 import SearchInput from 'components/base/searchInput';
 import MangaCard from 'components/library/manga';
@@ -61,10 +61,11 @@ export default function BrowseScreen() {
             renderItem={({ item }) => <MangaCard manga={item} onPress={() => handleCardPress(item.id)} />}
             keyExtractor={item => item.id}
             numColumns={3}
-            style={styles.flatList}
-            columnWrapperStyle={styles.columnWrapper}
-            refreshing={false}
-            onRefresh={() => { }}
+            style={{ paddingHorizontal: 10 }}
+            columnWrapperStyle={{ gap: 12 }}
+            refreshing={loading}
+            onRefresh={() => getRecent()}
+            ListEmptyComponent={<Text>No Results!</Text>}
           />
         )}
       </SafeAreaView>
