@@ -30,14 +30,17 @@ import { LinearGradient } from 'expo-linear-gradient';
 import {
   Book,
   ExternalLink,
+  Loader,
   Palette,
   Pencil,
   RefreshCcw,
   Share
 } from '@tamagui/lucide-icons';
+import { useMangadex } from 'hooks/sources/useMangadex';
 
 const MangaStack = () => {
   const { id } = useLocalSearchParams();
+  const { loading, getManga, getRecent } = useMangadex();
   const [manga, setManga] = useState<Manga | null>(null);
   const [blurHeader, setBlurHeader] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
@@ -50,6 +53,11 @@ const MangaStack = () => {
     setTimeout(() => {
       setRefreshing(false);
     }, 2000);
+  }, []);
+
+  useEffect(() => {
+    getManga(id as string)
+      .then(res => setManga(res))
   }, []);
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -70,13 +78,11 @@ const MangaStack = () => {
     return `rgba(0, 0, 0, ${alpha})`;
   };
 
-
-  useEffect(() => {
-    if (id) {
-      const mangaDetails = SAMPLE_DATA.find((item) => item.id === id);
-      setManga(mangaDetails || null);
-    }
-  }, [id]);
+  if (loading) {
+    return (
+      <Loader />
+    )
+  }
 
   if (!manga) {
     return (
@@ -125,7 +131,6 @@ const MangaStack = () => {
           }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
-
           <YStack f={1} backgroundColor={interpolateColor(blurHeader)} paddingTop={screenHeight / 4} paddingHorizontal="$4" gap="$4">
             <View>
               <H3>{manga.title}</H3>
@@ -142,7 +147,7 @@ const MangaStack = () => {
 
             <XStack gap="$2" ai="center">
               <Button f={1} size="$3.5" icon={<Book size="$1" />}>Read Now</Button>
-              <Button f={1} size="$3.5" icon={<RefreshCcw size="$1" />}>Tracking</Button>
+              <Button onPress={() => getRecent()} f={1} size="$3.5" icon={<RefreshCcw size="$1" />}>Tracking</Button>
               <ExternalLink pl="$4" />
               <Share />
             </XStack>
@@ -157,11 +162,6 @@ const MangaStack = () => {
                 <Button key={index} size="$2">{tag.title}</Button>
               ))}
             </XStack>
-
-            <Paragraph>{manga.description}</Paragraph>
-            <Paragraph>{manga.description}</Paragraph>
-            <Paragraph>{manga.description}</Paragraph>
-            <Paragraph>{manga.description}</Paragraph>
 
           </YStack>
         </ScrollView>

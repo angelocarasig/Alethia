@@ -22,11 +22,11 @@ export interface Manga {
 
   description?: string;
 
-  tags: Array<Tag>;
-
   lastRead?: Date;
   dateAdded?: Date;
   lastUpdated?: Date;
+
+  tags: Array<Tag>;
 
   readStatus: ReadStatus;
   contentStatus: ContentStatus;
