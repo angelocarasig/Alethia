@@ -19,7 +19,7 @@ const MangaStack = () => {
   if (!selectedManga) {
     return (
       <YStack f={1} jc="center" ai="center">
-        <Text>No manga details found.</Text>
+        <Text>No details found.</Text>
       </YStack>
     );
   }

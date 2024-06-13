@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@react-navigation/native": "^6.1.17",
+    "@shopify/flash-list": "1.6.4",
     "@tamagui/animate-presence": "^1.100.3",
     "@tamagui/config": "^1.100.3",
     "@tamagui/lucide-icons": "^1.100.3",

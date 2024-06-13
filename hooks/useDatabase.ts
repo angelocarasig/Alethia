@@ -80,7 +80,7 @@ const useMangaStore = create<DatabaseStore>((set, get) => {
 
 	const mangaInLibrary = (manga: Manga) => {
 		const library = get().library;
-		return library.some((item) => item.id === manga.id);
+		return library.some((item) => item.title === manga.title);
 	};
 
 	try {

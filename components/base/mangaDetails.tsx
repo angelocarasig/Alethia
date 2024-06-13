@@ -102,7 +102,7 @@ const MangaDetails = ({ manga, blurHeader, setBlurHeader }: MangaDetailProps) =>
           style={{ flex: 1, justifyContent: 'center' }}
           animate={{ backgroundColor: theme.background.val }}
         >
-          <Skeleton width={'100%'} height={1000} />
+          <Skeleton width={'100%'} height={650} />
         </MotiView>
       )}
       <Image

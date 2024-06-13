@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { FlatList, SafeAreaView } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { SafeAreaView } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { YStack, Text } from 'tamagui';
@@ -42,16 +43,18 @@ export default function LibraryScreen() {
           onSearchChange={handleSearch}
         />
       )}
-      <SafeAreaView style={{ flex: 1 }}>
-        <FlatList
+      <SafeAreaView style={{ flex: 1, width: "100%" }}>
+        <FlashList
           data={filteredData}
-          renderItem={({ item }) => <MangaCard manga={item} onPress={() => handleCardPress(item)} />}
-          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <MangaCard manga={item} onPress={() => handleCardPress(item)} />
+          )}
+          keyExtractor={(item) => item.id}
           numColumns={3}
-          style={{ paddingHorizontal: 10 }}
-          columnWrapperStyle={{ gap: 12 }}
-          refreshing={false}
+          contentContainerStyle={{ padding: 10 }}
+          refreshing={false} // TODO: Trigger update
           onRefresh={() => refreshLibrary()}
+          estimatedItemSize={175}
           ListEmptyComponent={<Text>Nothing in Library!</Text>}
         />
       </SafeAreaView>
