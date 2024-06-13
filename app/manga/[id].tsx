@@ -1,33 +1,20 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native'
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack } from 'expo-router';
 import { BlurView } from 'expo-blur';
 
 import { Text, YStack } from 'tamagui';
 
-import { Manga } from 'types/manga/manga';
-import { Loader } from '@tamagui/lucide-icons';
-import { useMangadex } from 'hooks/sources/useMangadex';
 import MangaDetails from 'components/base/mangaDetails';
+import { useManga } from 'hooks/useManga';
 
 const MangaStack = () => {
-  const { id } = useLocalSearchParams();
-  const { loading, getManga } = useMangadex();
-  const [manga, setManga] = useState<Manga | null>(null);
+  const { selectedManga } = useManga();
   const [blurHeader, setBlurHeader] = useState(0);
 
-  useEffect(() => {
-    getManga(id as string)
-      .then(res => setManga(res))
-  }, []);
+  console.log("Selected Manga: ", selectedManga);
 
-  if (loading) {
-    return (
-      <Loader />
-    )
-  }
-
-  if (!manga) {
+  if (!selectedManga) {
     return (
       <YStack f={1} jc="center" ai="center">
         <Text>No manga details found.</Text>
@@ -51,7 +38,7 @@ const MangaStack = () => {
               style={StyleSheet.absoluteFill} />
           ),
         }} />
-      <MangaDetails manga={manga} blurHeader={blurHeader} setBlurHeader={setBlurHeader} />
+      <MangaDetails manga={selectedManga} blurHeader={blurHeader} setBlurHeader={setBlurHeader} />
     </YStack>
   );
 }

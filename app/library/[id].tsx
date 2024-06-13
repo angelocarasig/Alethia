@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StyleSheet } from 'react-native'
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack } from 'expo-router';
 import { BlurView } from 'expo-blur';
 
 import {
@@ -9,17 +9,14 @@ import {
 
 } from 'tamagui';
 
-import useDatabase from 'hooks/useDatabase';
 import MangaDetails from 'components/base/mangaDetails';
+import { useManga } from 'hooks/useManga';
 
 const MangaStack = () => {
-  const { id } = useLocalSearchParams();
-  const { getManga } = useDatabase();
-  const manga = getManga(id as string);
-
+  const { selectedManga } = useManga();
   const [blurHeader, setBlurHeader] = useState(0);
 
-  if (!manga) {
+  if (!selectedManga) {
     return (
       <YStack f={1} jc="center" ai="center">
         <Text>No manga details found.</Text>
@@ -43,7 +40,7 @@ const MangaStack = () => {
               style={StyleSheet.absoluteFill} />
           ),
         }} />
-      <MangaDetails manga={manga} blurHeader={blurHeader} setBlurHeader={setBlurHeader} />
+      <MangaDetails manga={selectedManga} blurHeader={blurHeader} setBlurHeader={setBlurHeader} />
     </YStack>
   );
 }

@@ -26,12 +26,13 @@ type MangadexTagAttributes = {
   description: string;
 }
 
+//NOTE: Types of { [key: string]: string } usually depicts a language code followed by the resulting value
 type MangadexDataResponse = {
   id: uuid;
   type: 'manga';
   attributes: {
     title: { [key: string]: string },
-    description: string | { [key: string]: string },
+    description: { [key: string]: string },
     status: MangadexStatus,
     contentRating: MangadexContentRating,
     tags: [{ id: uuid, type: 'tag', attributes: MangadexTagAttributes }],
@@ -68,13 +69,13 @@ const resultToManga = (result: MangadexDataResponse | Array<MangadexDataResponse
       id: res.id,
       sourceId: 'alethia.mangadex',
       
-      title: res.attributes.title.en || res.attributes.title['ja-ro'],
+      title: res.attributes.title.en || res.attributes.title['ja'],
       author: res.relationships.find(x => x.type === 'author')?.attributes.name || '',
       artist: res.relationships.find(x => x.type === 'artist')?.attributes.name || '',
       url: `https://mangadex.org/manga/${res.id}`,
-      coverUrl: `https://mangadex.org/covers/${res.id}/${res.relationships.find(x => x.type === 'cover_art')?.attributes.fileName}${Array.isArray(result) ? '.256.jpg' : ''}`,
+      coverUrl: `https://mangadex.org/covers/${res.id}/${res.relationships.find(x => x.type === 'cover_art')?.attributes.fileName}`,
 
-      description: Array.isArray(result) ? res.attributes.description : res.attributes.description['en'],
+      description: res.attributes.description['en'],
 
       lastRead: new Date(-1),
       dateAdded: new Date(res.attributes.createdAt),
@@ -135,7 +136,7 @@ export function useMangadex(): SourceBase {
 
 		const API_BASE = new URL('https://api.mangadex.org/manga');
 		const params = {
-			limit: amount != null ? amount.toString() : '50',
+			limit: amount != null ? amount.toString() : '60',
 		};
 		const searchParams = new URLSearchParams();
 		['cover_art', 'author', 'artist'].forEach(include => {

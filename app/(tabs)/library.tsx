@@ -7,8 +7,11 @@ import SearchInput from 'components/base/searchInput';
 import MangaCard from 'components/library/manga';
 
 import useDatabase from 'hooks/useDatabase';
+import { Manga } from 'types/manga';
+import { useManga } from 'hooks/useManga';
 
 export default function LibraryScreen() {
+  const { setSelectedManga } = useManga();
   const { library, refreshLibrary } = useDatabase();
   const [filteredData, setFilteredData] = useState(library);
   const router = useRouter();
@@ -24,8 +27,9 @@ export default function LibraryScreen() {
     setFilteredData(filtered);
   };
 
-  const handleCardPress = (id: string) => {
-    router.push(`/library/${id}`);
+  const handleCardPress = (manga: Manga) => {
+    setSelectedManga(manga);
+    router.push(`/library/${manga.id}`);
   };
 
   return (
@@ -39,7 +43,7 @@ export default function LibraryScreen() {
       <SafeAreaView style={{ flex: 1 }}>
         <FlatList
           data={filteredData}
-          renderItem={({ item }) => <MangaCard manga={item} onPress={() => handleCardPress(item.id)} />}
+          renderItem={({ item }) => <MangaCard manga={item} onPress={() => handleCardPress(item)} />}
           keyExtractor={item => item.id}
           numColumns={3}
           style={{ paddingHorizontal: 10 }}

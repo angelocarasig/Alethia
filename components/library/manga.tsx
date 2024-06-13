@@ -1,5 +1,8 @@
-import { Image, StyleSheet, Dimensions, Pressable, TouchableHighlight } from 'react-native';
-import { Text, YStack } from 'tamagui';
+import React, { useState, useEffect } from 'react';
+import { Image, Dimensions, TouchableHighlight } from 'react-native';
+import { Text, useTheme, YStack } from 'tamagui';
+import { MotiView } from 'moti';
+import { Skeleton } from 'moti/skeleton';
 
 import { Manga } from 'types/manga/manga';
 
@@ -9,25 +12,46 @@ interface MangaCardProps {
 }
 
 const MangaCard = ({ manga, onPress }: MangaCardProps) => {
+  const theme = useTheme();
+  const [imageLoading, setImageLoading] = useState(true);
   const windowWidth = Dimensions.get('window').width;
 
   const getSourceHeight = () => {
     if (windowWidth < 375) {
       return 125;
-    }
-    else if (windowWidth < 420) {
+    } else if (windowWidth < 420) {
       return 150;
-    }
-    else return 175;
-  }
+    } else return 175;
+  };
+
+  const getSourceWidth = () => {
+    return getSourceHeight() * (11 / 16);
+  };
 
   return (
     <TouchableHighlight onPress={onPress}>
       <YStack py="$2">
+        {imageLoading && (
+          <MotiView
+            transition={{
+              type: 'timing',
+            }}
+            animate={{ backgroundColor: theme.background.val }}
+          >
+            <Skeleton width={getSourceWidth()} height={getSourceHeight()} />
+          </MotiView>
+        )}
         <Image
-          source={{ uri: manga.coverUrl, height: getSourceHeight() }}
-          style={styles.image}
-          resizeMode="cover"
+          style={{
+            borderRadius: 8,
+            aspectRatio: 11 / 16,
+            height: getSourceHeight(),
+            width: getSourceWidth(),
+            opacity: imageLoading ? 0 : 1,
+          }}
+          source={{ uri: manga.coverUrl + '.512.jpg' }}
+          onLoad={() => setImageLoading(false)}
+          onError={() => setImageLoading(false)}
         />
         <Text
           letterSpacing={-0.35}
@@ -39,15 +63,8 @@ const MangaCard = ({ manga, onPress }: MangaCardProps) => {
           {manga.title}
         </Text>
       </YStack>
-    </TouchableHighlight >
+    </TouchableHighlight>
   );
 }
-
-const styles = StyleSheet.create({
-  image: {
-    borderRadius: 8,
-    aspectRatio: 11 / 16,
-  },
-});
 
 export default MangaCard;

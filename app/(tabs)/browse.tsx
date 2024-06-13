@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { FlatList, SafeAreaView, StyleSheet, ActivityIndicator } from 'react-native';
+import { SafeAreaView, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import { useRouter } from 'expo-router';
-import { YStack, Text } from 'tamagui';
+
+import { YStack, Text, useTheme } from 'tamagui';
 
 import SearchInput from 'components/base/searchInput';
 import MangaCard from 'components/library/manga';
 
 import { Manga } from 'types/manga/manga';
 import { useMangadex } from 'hooks/sources/useMangadex';
+import { useManga } from 'hooks/useManga';
 
 const styles = StyleSheet.create({
   container: {
@@ -15,14 +17,12 @@ const styles = StyleSheet.create({
   },
   columnWrapper: {
     gap: 12
-  },
-  flatList: {
-    paddingHorizontal: 10,
   }
 });
 
 export default function BrowseScreen() {
   const [filteredData, setFilteredData] = useState<Manga[]>([]);
+  const { setSelectedManga } = useManga();
   const router = useRouter();
   const { loading, getRecent } = useMangadex();
 
@@ -42,8 +42,9 @@ export default function BrowseScreen() {
     setFilteredData(filtered);
   };
 
-  const handleCardPress = (id: string) => {
-    router.push(`/manga/${id}`);
+  const handleCardPress = (manga: Manga) => {
+    setSelectedManga(manga);
+    router.push(`/manga/${manga.id}`);
   };
 
   return (
@@ -54,14 +55,14 @@ export default function BrowseScreen() {
       />
       <SafeAreaView style={styles.container}>
         {loading ? (
-          <ActivityIndicator size="large" color="#000000" />
+          <ActivityIndicator size="large" />
         ) : (
           <FlatList
             data={filteredData}
-            renderItem={({ item }) => <MangaCard manga={item} onPress={() => handleCardPress(item.id)} />}
+            renderItem={({ item }) => <MangaCard manga={item} onPress={() => handleCardPress(item)} />}
             keyExtractor={item => item.id}
             numColumns={3}
-            style={{ paddingHorizontal: 10 }}
+            contentContainerStyle={{ paddingHorizontal: 10 }}
             columnWrapperStyle={{ gap: 12 }}
             refreshing={loading}
             onRefresh={() => getRecent()}

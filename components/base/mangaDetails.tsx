@@ -9,6 +9,7 @@ import {
   TouchableOpacity
 } from 'react-native'
 
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import {
@@ -17,10 +18,10 @@ import {
   Text,
   XStack,
   YStack,
-  Image,
   H3,
   View,
-  Button
+  Button,
+  useTheme
 } from 'tamagui';
 
 import {
@@ -35,6 +36,8 @@ import {
 
 import { Manga } from 'types/manga';
 import useDatabase from 'hooks/useDatabase';
+import { MotiView } from 'moti';
+import { Skeleton } from 'moti/skeleton';
 
 interface MangaDetailProps {
   manga: Manga;
@@ -43,8 +46,10 @@ interface MangaDetailProps {
 }
 
 const MangaDetails = ({ manga, blurHeader, setBlurHeader }: MangaDetailProps) => {
+  const theme = useTheme();
   const { addToLibrary, deleteFromLibrary, mangaInLibrary } = useDatabase();
   const [refreshing, setRefreshing] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
   const [expandDescription, setExpandDescription] = useState(false);
 
   const screenHeight = Dimensions.get('window').height;
@@ -88,9 +93,22 @@ const MangaDetails = ({ manga, blurHeader, setBlurHeader }: MangaDetailProps) =>
 
   return (
     <>
+      {imageLoading && (
+        <MotiView
+          transition={{
+            type: 'timing',
+          }}
+          style={{ flex: 1, justifyContent: 'center' }}
+          animate={{ backgroundColor: theme.background.val }}
+        >
+          <Skeleton width={'100%'} height={1000} />
+        </MotiView>
+      )}
       <Image
         style={{ width: "100%", height: 650, position: "absolute" }}
-        source={{ uri: manga.coverUrl }}>
+        source={{ uri: manga.coverUrl }}
+        onLoad={() => setImageLoading(false)}
+        onError={() => setImageLoading(false)}>
       </Image>
       <LinearGradient
         colors={['transparent', '#000000']}
@@ -141,7 +159,7 @@ const MangaDetails = ({ manga, blurHeader, setBlurHeader }: MangaDetailProps) =>
 
             <TouchableOpacity onPress={() => setExpandDescription(!expandDescription)}>
               <Paragraph numberOfLines={expandDescription ? undefined : 6}>
-                {manga.description}
+                {manga.description || "No Description Available."}
               </Paragraph>
             </TouchableOpacity>
             <XStack mt="$2" gap="$2" flexWrap="wrap">

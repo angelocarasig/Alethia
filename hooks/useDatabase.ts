@@ -1,11 +1,13 @@
-// useMangaStore.ts
 import { create } from 'zustand';
-import { desc, eq } from 'drizzle-orm';
-import { mangaTable, type SelectManga } from 'db/schema';
-import { db } from 'db/client';
-import { Manga, Tag, ReadStatus, ContentStatus, ContentRating } from 'types/manga';
 import * as Crypto from 'expo-crypto';
+
+import { desc, eq } from 'drizzle-orm';
+import { db } from 'db/client';
+import { mangaTable, type SelectManga } from 'db/schema';
+
+import { Manga, Tag, ReadStatus, ContentStatus, ContentRating } from 'types/manga';
 import { uuid } from 'types/base/uid';
+import { useEffect } from 'react';
 
 const mapSelectMangaToManga = (selectManga: SelectManga): Manga => {
 	return {
@@ -27,7 +29,7 @@ const mapSelectMangaToManga = (selectManga: SelectManga): Manga => {
 	};
 };
 
-type MangaStore = {
+type DatabaseStore = {
 	library: Manga[];
 	actions: {
 		refreshLibrary: () => void;
@@ -37,7 +39,7 @@ type MangaStore = {
 	};
 };
 
-const useMangaStore = create<MangaStore>((set) => {
+const useMangaStore = create<DatabaseStore>((set) => {
 	const fetchLibrary = db.select().from(mangaTable).orderBy(desc(mangaTable.id));
 
 	const refreshLibrary = () => {
