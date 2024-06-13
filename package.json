@@ -28,6 +28,7 @@
     "expo-blur": "~13.0.2",
     "expo-crypto": "^13.0.2",
     "expo-font": "^12.0.7",
+    "expo-haptics": "~13.0.1",
     "expo-image": "~1.12.12",
     "expo-linear-gradient": "~13.0.2",
     "expo-linking": "~6.3.1",

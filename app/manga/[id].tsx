@@ -12,8 +12,6 @@ const MangaStack = () => {
   const { selectedManga } = useManga();
   const [blurHeader, setBlurHeader] = useState(0);
 
-  console.log("Selected Manga: ", selectedManga);
-
   if (!selectedManga) {
     return (
       <YStack f={1} jc="center" ai="center">

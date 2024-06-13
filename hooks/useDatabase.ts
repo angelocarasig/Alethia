@@ -6,8 +6,6 @@ import { db } from 'db/client';
 import { mangaTable, type SelectManga } from 'db/schema';
 
 import { Manga, Tag, ReadStatus, ContentStatus, ContentRating } from 'types/manga';
-import { uuid } from 'types/base/uid';
-import { useEffect } from 'react';
 
 const mapSelectMangaToManga = (selectManga: SelectManga): Manga => {
 	return {
@@ -34,12 +32,12 @@ type DatabaseStore = {
 	actions: {
 		refreshLibrary: () => void;
 		addToLibrary: (manga: Manga) => void;
-    deleteFromLibrary: (manga: Manga) => void;
-		getManga: (mangaId: string) => Manga | null;
+		deleteFromLibrary: (manga: Manga) => void;
+		mangaInLibrary: (manga: Manga) => boolean;
 	};
 };
 
-const useMangaStore = create<DatabaseStore>((set) => {
+const useMangaStore = create<DatabaseStore>((set, get) => {
 	const fetchLibrary = db.select().from(mangaTable).orderBy(desc(mangaTable.id));
 
 	const refreshLibrary = () => {
@@ -51,7 +49,7 @@ const useMangaStore = create<DatabaseStore>((set) => {
 		db.insert(mangaTable)
 			.values({
 				id: Crypto.randomUUID(),
-        mangaId: manga.id,
+				mangaId: manga.id,
 				sourceId: manga.sourceId,
 				title: manga.title,
 				author: manga.author,
@@ -69,21 +67,20 @@ const useMangaStore = create<DatabaseStore>((set) => {
 			})
 			.run();
 
+		set((state) => ({
+			library: [...state.library, manga]
+		}));
+	};
+
+	const deleteFromLibrary = (manga: Manga) => {
+		db.delete(mangaTable).where(eq(mangaTable.title, manga.title)).run();
+
 		refreshLibrary();
 	};
 
-  const deleteFromLibrary = (manga: Manga) => {
-    db.delete(mangaTable)
-      .where(eq(mangaTable.title, manga.title))
-      .run();
-
-    refreshLibrary();
-  };
-
-	const getManga = (mangaId: uuid): Manga | null => {
-		const result = db.select().from(mangaTable).where(eq(mangaTable.id, mangaId)).get();
-
-		return result ? mapSelectMangaToManga(result) : null;
+	const mangaInLibrary = (manga: Manga) => {
+		const library = get().library;
+		return library.some((item) => item.id === manga.id);
 	};
 
 	try {
@@ -92,8 +89,8 @@ const useMangaStore = create<DatabaseStore>((set) => {
 			actions: {
 				refreshLibrary,
 				addToLibrary,
-        deleteFromLibrary,
-				getManga
+				deleteFromLibrary,
+				mangaInLibrary
 			}
 		};
 	} catch (error) {
@@ -103,8 +100,8 @@ const useMangaStore = create<DatabaseStore>((set) => {
 			actions: {
 				refreshLibrary,
 				addToLibrary,
-        deleteFromLibrary,
-				getManga
+				deleteFromLibrary,
+				mangaInLibrary
 			}
 		};
 	}
@@ -115,19 +112,14 @@ export const useLibraryActions = () => useMangaStore((state) => state.actions);
 
 const useDatabase = () => {
 	const library = useLibrary();
-	const { refreshLibrary, addToLibrary, deleteFromLibrary, getManga } = useLibraryActions();
-
-  const mangaInLibrary = (manga: Manga) => {
-    return library.some(x => x.title === manga.title);
-  }
+	const { refreshLibrary, addToLibrary, deleteFromLibrary, mangaInLibrary } = useLibraryActions();
 
 	return {
 		library,
-		getManga,
 		refreshLibrary,
 		addToLibrary,
-    deleteFromLibrary,
-    mangaInLibrary,
+		deleteFromLibrary,
+		mangaInLibrary
 	};
 };
 

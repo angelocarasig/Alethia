@@ -4,5 +4,5 @@ import { Manga } from 'types/manga/manga';
 export interface SourceBase {
 	loading: boolean;
 	getManga(mangaId: uuid): Promise<Manga | null>;
-	getRecent(amount?: number): Promise<Array<Manga>>;
+	getRecent(amount?: number, pageNumber?: number): Promise<Array<Manga>>;
 }

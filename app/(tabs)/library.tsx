@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FlatList, SafeAreaView } from 'react-native';
 import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { YStack, Text } from 'tamagui';
 
 import SearchInput from 'components/base/searchInput';
@@ -28,6 +29,7 @@ export default function LibraryScreen() {
   };
 
   const handleCardPress = (manga: Manga) => {
+    Haptics.selectionAsync();
     setSelectedManga(manga);
     router.push(`/library/${manga.id}`);
   };

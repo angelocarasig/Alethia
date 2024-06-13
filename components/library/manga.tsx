@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Image, Dimensions, TouchableHighlight } from 'react-native';
+import { useState } from 'react';
+import { Image, Dimensions, TouchableHighlight, View } from 'react-native';
 import { Text, useTheme, YStack } from 'tamagui';
 import { MotiView } from 'moti';
 import { Skeleton } from 'moti/skeleton';
@@ -41,18 +41,26 @@ const MangaCard = ({ manga, onPress }: MangaCardProps) => {
             <Skeleton width={getSourceWidth()} height={getSourceHeight()} />
           </MotiView>
         )}
-        <Image
+        <View
           style={{
-            borderRadius: 8,
-            aspectRatio: 11 / 16,
-            height: getSourceHeight(),
+            position: imageLoading ? 'absolute' : 'relative',
             width: getSourceWidth(),
+            height: getSourceHeight(),
             opacity: imageLoading ? 0 : 1,
           }}
-          source={{ uri: manga.coverUrl + '.512.jpg' }}
-          onLoad={() => setImageLoading(false)}
-          onError={() => setImageLoading(false)}
-        />
+        >
+          <Image
+            style={{
+              borderRadius: 8,
+              aspectRatio: 11 / 16,
+              height: getSourceHeight(),
+              width: getSourceWidth(),
+            }}
+            source={{ uri: manga.coverUrl + '.512.jpg' }}
+            onLoad={() => setImageLoading(false)}
+            onError={() => setImageLoading(false)}
+          />
+        </View>
         <Text
           letterSpacing={-0.35}
           lineHeight={18}

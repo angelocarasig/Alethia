@@ -124,25 +124,25 @@ export function useMangadex(): SourceBase {
 
     const res = await response.json();
 
-    console.log("Res: ", res.data);
-
     const newManga = resultToManga(res.data) as Manga;
     setLoading(false);
     return newManga;
 	};
 
-	const getRecent = async (amount?: number): Promise<Array<Manga>> => {
+	const getRecent = async (amount: number = 60, pageNumber: number = 0): Promise<Array<Manga>> => {
 		setLoading(true);
 
 		const API_BASE = new URL('https://api.mangadex.org/manga');
 		const params = {
-			limit: amount != null ? amount.toString() : '60',
+			limit: amount.toString(),
+      offset: (amount * pageNumber).toString()
 		};
 		const searchParams = new URLSearchParams();
 		['cover_art', 'author', 'artist'].forEach(include => {
       searchParams.append('includes[]', include);
     });
     searchParams.append('limit', params.limit);
+    searchParams.append('offset', params.offset);
 
 		API_BASE.search = searchParams.toString();
 

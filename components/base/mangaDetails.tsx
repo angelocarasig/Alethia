@@ -10,6 +10,7 @@ import {
 } from 'react-native'
 
 import { Image } from 'expo-image';
+import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import {
@@ -146,18 +147,18 @@ const MangaDetails = ({ manga, blurHeader, setBlurHeader }: MangaDetailProps) =>
             <XStack gap="$2" ai="center">
               {mangaInLibrary(manga) ?
                 (
-                  <Button themeInverse onPress={() => deleteFromLibrary(manga)} f={1} size="$3.5" icon={<Heart size="$1" />}>In Library</Button>
+                  <Button themeInverse f={1} size="$3.5" icon={<Heart size="$1" />} onPress={() => { deleteFromLibrary(manga); Haptics.selectionAsync() }}>In Library</Button>
                 ) : (
-                  <Button onPress={() => addToLibrary(manga)} f={1} size="$3.5" icon={<PlusCircle size="$1" />}>Add To Library</Button>
+                  <Button onPress={() => { addToLibrary(manga); Haptics.selectionAsync() }} f={1} size="$3.5" icon={<PlusCircle size="$1" />}>Add To Library</Button>
                 )}
-              <Button onPress={() => console.log("Pressed Tracking")} size="$3.5" icon={<RefreshCcw size="$1" />}>Tracking</Button>
+              <Button onPress={() => Haptics.selectionAsync()} size="$3.5" icon={<RefreshCcw size="$1" />}>Tracking</Button>
               <XStack pl="$2" gap="$3">
                 <ExternalLink pl="$4" onPress={() => openLink(manga.url)} />
                 <Share2 />
               </XStack>
             </XStack>
 
-            <TouchableOpacity onPress={() => setExpandDescription(!expandDescription)}>
+            <TouchableOpacity onPress={() => {setExpandDescription(!expandDescription); Haptics.selectionAsync()}}>
               <Paragraph numberOfLines={expandDescription ? undefined : 6}>
                 {manga.description || "No Description Available."}
               </Paragraph>

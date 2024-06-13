@@ -5298,6 +5298,7 @@ __metadata:
     expo-blur: "npm:~13.0.2"
     expo-crypto: "npm:^13.0.2"
     expo-font: "npm:^12.0.7"
+    expo-haptics: "npm:~13.0.1"
     expo-image: "npm:~1.12.12"
     expo-linear-gradient: "npm:~13.0.2"
     expo-linking: "npm:~6.3.1"
@@ -7546,6 +7547,15 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: 75c887f232b1a60270388daf59801be8575c20ddb24b6548b43bd1961cfaf0b5524cd4e4c00270d83478f9071cef4d51c4d2d92eff227cef93e5a0afd3fa3247
+  languageName: node
+  linkType: hard
+
+"expo-haptics@npm:~13.0.1":
+  version: 13.0.1
+  resolution: "expo-haptics@npm:13.0.1"
+  peerDependencies:
+    expo: "*"
+  checksum: 2ed8d292f89208b21fece50c2d21c4272833fd37cb769e382365a9502b844c33f582ceee374ad8d3c184cc75418ca9a6daf54005de281c0a952c7f2a39b026c9
   languageName: node
   linkType: hard
 
