@@ -22,7 +22,6 @@ const styles = StyleSheet.create({
     left: -5,
     paddingHorizontal: 8,
     paddingVertical: 2,
-    backgroundColor: '#2e65a3',
     fontSize: 10,
   }
 })
@@ -77,7 +76,7 @@ const MangaCard = ({ manga, onPress, inBrowse }: MangaCardProps) => {
                 display: mangaInLibrary(manga) ? 'flex' : 'none'
               }}
             >
-              <Button size='$1' style={styles.tag}>In Library</Button>
+              <Button themeInverse size='$1' style={styles.tag}>In Library</Button>
             </View>
           )}
           <Image

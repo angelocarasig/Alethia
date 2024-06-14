@@ -47,6 +47,7 @@ type MangadexDataResponse = {
   }]
 }
 
+
 const mapMangadexStatusToContentStatus = (status: MangadexStatus): ContentStatus => {
   switch (status) {
     case MangadexStatus.COMPLETED:
@@ -129,6 +130,10 @@ export function useMangadex(): SourceBase {
     return newManga;
 	};
 
+  const getChapters = (manga: Manga) => {
+
+  }
+
 	const getRecent = async (amount: number = 60, pageNumber: number = 0): Promise<Array<Manga>> => {
 		setLoading(true);
 
@@ -175,6 +180,7 @@ export function useMangadex(): SourceBase {
 	return {
 		loading,
 		getManga,
-		getRecent
+		getRecent,
+    getChapters
 	};
 }
