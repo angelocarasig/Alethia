@@ -112,7 +112,7 @@ const MangaDetails = ({ manga, blurHeader, setBlurHeader }: MangaDetailProps) =>
         onError={() => setImageLoading(false)}>
       </Image>
       <LinearGradient
-        colors={['transparent', '#000000']}
+        colors={['transparent', theme.background.val]}
         locations={[0, 1]}
         end={{ x: 0.5, y: 0.7 }}
         dither={false}
