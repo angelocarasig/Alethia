@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dimensions,
   Linking,
@@ -6,8 +6,9 @@ import {
   NativeSyntheticEvent,
   RefreshControl,
   SafeAreaView,
-  TouchableOpacity
-} from 'react-native'
+  StyleSheet,
+  TouchableWithoutFeedback
+} from 'react-native';
 
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
@@ -22,10 +23,15 @@ import {
   H3,
   View,
   Button,
-  useTheme
+  useTheme,
+  ListItem,
+  YGroup,
+  Separator,
 } from 'tamagui';
 
 import {
+  ChevronDown,
+  DownloadCloud,
   ExternalLink,
   Heart,
   Palette,
@@ -39,6 +45,8 @@ import { Manga } from 'types/manga';
 import useDatabase from 'hooks/useDatabase';
 import { MotiView } from 'moti';
 import { Skeleton } from 'moti/skeleton';
+import { useMangadex } from 'hooks/sources/useMangadex';
+import { FlashList } from '@shopify/flash-list';
 
 interface MangaDetailProps {
   manga: Manga;
@@ -49,17 +57,28 @@ interface MangaDetailProps {
 const MangaDetails = ({ manga, blurHeader, setBlurHeader }: MangaDetailProps) => {
   const theme = useTheme();
   const { addToLibrary, deleteFromLibrary, mangaInLibrary } = useDatabase();
-  const [refreshing, setRefreshing] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
   const [expandDescription, setExpandDescription] = useState(false);
+  const [chapters, setChapters] = useState<Array<any>>([]);
+  const [loadingChapters, setLoadingChapters] = useState(false);
+  const { getChapters } = useMangadex();
 
   const screenHeight = Dimensions.get('window').height;
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
+  const fetchChapters = async () => {
+    setLoadingChapters(true);
+    try {
+      const chapters = await getChapters(manga);
+      setChapters(chapters);
+    } catch (error) {
+      console.error('Error fetching chapters:', error);
+    } finally {
+      setLoadingChapters(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchChapters();
   }, []);
 
   const openLink = (url: string) => {
@@ -83,6 +102,26 @@ const MangaDetails = ({ manga, blurHeader, setBlurHeader }: MangaDetailProps) =>
     const alpha = Math.min(1, Math.max(0, value / 100));
     return `rgba(0, 0, 0, ${alpha})`;
   };
+
+  const styles = StyleSheet.create({
+    coreDetails: {
+      flex: 1,
+      backgroundColor: interpolateColor(blurHeader),
+      paddingTop: screenHeight / 4,
+      paddingHorizontal: 12,
+      gap: 12
+    },
+    moreDropdown: {
+      position: 'absolute',
+      bottom: -30,
+      right: 0,
+      fontSize: 14,
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignContent: 'center'
+    }
+  })
 
   if (!manga) {
     return (
@@ -109,29 +148,27 @@ const MangaDetails = ({ manga, blurHeader, setBlurHeader }: MangaDetailProps) =>
         style={{ width: "100%", height: 650, position: "absolute" }}
         source={{ uri: manga.coverUrl }}
         onLoad={() => setImageLoading(false)}
-        onError={() => setImageLoading(false)}>
-      </Image>
+        onError={() => setImageLoading(false)}
+      />
       <LinearGradient
         colors={['transparent', theme.background.val]}
         locations={[0, 1]}
-        end={{ x: 0.5, y: 0.7 }}
+        end={{ x: 0.5, y: 0.6 }}
         dither={false}
         style={{
           width: "100%",
           height: 650,
           position: 'absolute'
         }}
-      ></LinearGradient>
+      />
       <SafeAreaView>
         <ScrollView
           onScroll={handleScroll}
-          contentContainerStyle={{
-            alignItems: 'center',
-          }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          contentContainerStyle={{ alignItems: 'center' }}
+          refreshControl={<RefreshControl refreshing={loadingChapters} onRefresh={fetchChapters} />}
         >
-          <YStack f={1} backgroundColor={interpolateColor(blurHeader)} paddingTop={screenHeight / 4} paddingHorizontal="$4" gap="$4">
-            <View>
+          <YStack style={styles.coreDetails}>
+            <View style={{ gap: 4 }}>
               <H3>{manga.title}</H3>
               <XStack gap="$2">
                 {manga.author && (
@@ -158,22 +195,53 @@ const MangaDetails = ({ manga, blurHeader, setBlurHeader }: MangaDetailProps) =>
               </XStack>
             </XStack>
 
-            <TouchableOpacity onPress={() => {setExpandDescription(!expandDescription); Haptics.selectionAsync()}}>
-              <Paragraph numberOfLines={expandDescription ? undefined : 6}>
-                {manga.description || "No Description Available."}
-              </Paragraph>
-            </TouchableOpacity>
-            <XStack mt="$2" gap="$2" flexWrap="wrap">
+            <TouchableWithoutFeedback onPress={() => { setExpandDescription(!expandDescription); Haptics.selectionAsync() }}>
+              <View animation="bouncy" style={{ flex: 1, position: 'relative' }}>
+                <Paragraph userSelect='none' numberOfLines={expandDescription ? undefined : 6}>
+                  {manga.description || "No Description Available."}
+                </Paragraph>
+                {!expandDescription && (
+                  <View style={styles.moreDropdown}>
+                    <Paragraph>More</Paragraph>
+                    <ChevronDown />
+                  </View>
+                )}
+              </View>
+            </TouchableWithoutFeedback>
+
+            <XStack mt="$6" pb="$6" gap="$2" flexWrap="wrap">
               {manga.tags.map((tag, index) => (
                 <Button key={index} size="$2">{tag.title}</Button>
               ))}
             </XStack>
-
           </YStack>
+
+          <YGroup als="center" w="100%" size="$4" backgroundColor="black">
+            <FlashList
+              data={chapters}
+              contentContainerStyle={{}}
+              estimatedItemSize={83}
+              refreshing={loadingChapters}
+              renderItem={({ item }) => (
+                <>
+                  <YGroup.Item>
+                    <ListItem
+                      hoverTheme
+                      title={`Chapter ${item.chapterNumber} ${item.title != null ? '- ' + item.title : ''}`}
+                      subTitle={new Date(item.date).toLocaleString()}
+                      iconAfter={Math.random() > 0.5 ? <DownloadCloud /> : <></>} // TODO: Icon if downloaded
+                      scaleIcon={1.5}
+                    />
+                  </YGroup.Item>
+                  <Separator alignSelf="stretch" />
+                </>
+              )}
+            />
+          </YGroup>
         </ScrollView>
       </SafeAreaView>
     </>
-  )
+  );
 }
 
 export default MangaDetails;

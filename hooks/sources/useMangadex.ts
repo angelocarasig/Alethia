@@ -8,131 +8,162 @@ import { ContentStatus, ReadStatus } from 'types/manga/status';
 import { ContentRating } from 'types/manga/contentRating';
 
 enum MangadexStatus {
-  COMPLETED = "completed", 
-  ONGOING = "ongoing",
-  CANCELLED = "cancelled", 
-  HIATUS = "hiatus"
+	COMPLETED = 'completed',
+	ONGOING = 'ongoing',
+	CANCELLED = 'cancelled',
+	HIATUS = 'hiatus'
 }
 
 enum MangadexContentRating {
-  SAFE = "safe", 
-  SUGGESTIVE = "suggestive", 
-  EROTICA = "erotica", 
-  PORNOGRAPHIC = "pornographic"
+	SAFE = 'safe',
+	SUGGESTIVE = 'suggestive',
+	EROTICA = 'erotica',
+	PORNOGRAPHIC = 'pornographic'
 }
 
 type MangadexTagAttributes = {
-  name: { [key: string]: string };
-  description: string;
-}
+	name: { [key: string]: string };
+	description: string;
+};
 
 //NOTE: Types of { [key: string]: string } usually depicts a language code followed by the resulting value
 type MangadexDataResponse = {
-  id: uuid;
-  type: 'manga';
-  attributes: {
-    title: { [key: string]: string },
-    description: { [key: string]: string },
-    status: MangadexStatus,
-    contentRating: MangadexContentRating,
-    tags: [{ id: uuid, type: 'tag', attributes: MangadexTagAttributes }],
+	id: uuid;
+	type: 'manga';
+	attributes: {
+		title: { [key: string]: string };
+		description: { [key: string]: string };
+		status: MangadexStatus;
+		contentRating: MangadexContentRating;
+		tags: [{ id: uuid; type: 'tag'; attributes: MangadexTagAttributes }];
 
-    createdAt: string // Need to convert to date
-    updatedAt: string // Need to convert to date
-  }
-  relationships: [{
-    id: uuid;
-    type: 'author' | 'artist' | 'cover_art';
-    attributes: { [key: string]: string }
-  }]
-}
-
-
-const mapMangadexStatusToContentStatus = (status: MangadexStatus): ContentStatus => {
-  switch (status) {
-    case MangadexStatus.COMPLETED:
-      return ContentStatus.Completed;
-    case MangadexStatus.ONGOING:
-      return ContentStatus.Ongoing;
-    case MangadexStatus.CANCELLED:
-      return ContentStatus.Cancelled;
-    case MangadexStatus.HIATUS:
-      return ContentStatus.Hiatus;
-    default:
-      throw new Error(`Unknown MangadexStatus: ${status}`);
-  }
+		createdAt: string; // Need to convert to date
+		updatedAt: string; // Need to convert to date
+	};
+	relationships: [
+		{
+			id: uuid;
+			type: 'author' | 'artist' | 'cover_art';
+			attributes: { [key: string]: string };
+		}
+	];
 };
 
+const mapMangadexStatusToContentStatus = (status: MangadexStatus): ContentStatus => {
+	switch (status) {
+		case MangadexStatus.COMPLETED:
+			return ContentStatus.Completed;
+		case MangadexStatus.ONGOING:
+			return ContentStatus.Ongoing;
+		case MangadexStatus.CANCELLED:
+			return ContentStatus.Cancelled;
+		case MangadexStatus.HIATUS:
+			return ContentStatus.Hiatus;
+		default:
+			throw new Error(`Unknown MangadexStatus: ${status}`);
+	}
+};
 
 const resultToManga = (result: MangadexDataResponse | Array<MangadexDataResponse>) => {
-  const mapResponse = (res: MangadexDataResponse): Manga => {
-    return {
-      id: res.id,
-      sourceId: 'alethia.mangadex',
-      
-      title: res.attributes.title.en || res.attributes.title['ja'],
-      author: res.relationships.find(x => x.type === 'author')?.attributes.name || '',
-      artist: res.relationships.find(x => x.type === 'artist')?.attributes.name || '',
-      url: `https://mangadex.org/manga/${res.id}`,
-      coverUrl: `https://mangadex.org/covers/${res.id}/${res.relationships.find(x => x.type === 'cover_art')?.attributes.fileName}`,
+	const mapResponse = (res: MangadexDataResponse): Manga => {
+		return {
+			id: res.id,
+			sourceId: 'alethia.mangadex',
 
-      description: res.attributes.description['en'],
+			title: res.attributes.title.en || res.attributes.title['ja'],
+			author: res.relationships.find((x) => x.type === 'author')?.attributes.name || '',
+			artist: res.relationships.find((x) => x.type === 'artist')?.attributes.name || '',
+			url: `https://mangadex.org/manga/${res.id}`,
+			coverUrl: `https://mangadex.org/covers/${res.id}/${
+				res.relationships.find((x) => x.type === 'cover_art')?.attributes.fileName
+			}`,
 
-      lastRead: new Date(-1),
-      dateAdded: new Date(res.attributes.createdAt),
-      lastUpdated: new Date(res.attributes.updatedAt),
+			description: res.attributes.description['en'],
 
-      tags: res.attributes.tags.map(tag => { return { title: tag.attributes.name.en } }),
+			lastRead: new Date(-1),
+			dateAdded: new Date(res.attributes.createdAt),
+			lastUpdated: new Date(res.attributes.updatedAt),
 
-      readStatus: ReadStatus.PlanningToRead,
-      contentStatus: mapMangadexStatusToContentStatus(res.attributes.status),
-      contentRating: ContentRating.Safe
-    };
-  }
+			tags: res.attributes.tags.map((tag) => {
+				return { title: tag.attributes.name.en };
+			}),
 
-  return Array.isArray(result) ? result.map(x => mapResponse(x)) : mapResponse(result);
-}
+			readStatus: ReadStatus.PlanningToRead,
+			contentStatus: mapMangadexStatusToContentStatus(res.attributes.status),
+			contentRating: ContentRating.Safe
+		};
+	};
+
+	return Array.isArray(result) ? result.map((x) => mapResponse(x)) : mapResponse(result);
+};
+
+const resultToChapter = (result: Array<any>): Array<any> => {
+	return result
+		.map((res) => {
+			const x = {
+				chapterNumber: parseFloat(res.attributes.chapter),
+				title: res.attributes.title,
+				date: new Date(res.attributes.publishAt)
+			};
+
+			return x;
+		})
+		.sort((a, b) => b.chapterNumber - a.chapterNumber);
+};
 
 export function useMangadex(): SourceBase {
-  const [mangas, setMangas] = useState<Array<Manga>>([]);
+	const [mangas, setMangas] = useState<Array<Manga>>([]);
 	const [loading, setLoading] = useState(false);
 
 	const getManga = async (mangaId: string) => {
-    setLoading(true);
-		const manga = mangas.find(manga => manga.id === mangaId);
+		setLoading(true);
+		const manga = mangas.find((manga) => manga.id === mangaId);
 
-    if (manga != null) {
-      return manga;
-    }
+		if (manga != null) {
+			return manga;
+		}
 
-    const API_BASE = new URL(`https://api.mangadex.org/manga/${mangaId}`);
+		const API_BASE = new URL(`https://api.mangadex.org/manga/${mangaId}`);
 		const searchParams = new URLSearchParams();
-		['cover_art', 'author', 'artist'].forEach(include => {
-      searchParams.append('includes[]', include);
-    });
+		['cover_art', 'author', 'artist'].forEach((include) => {
+			searchParams.append('includes[]', include);
+		});
 		API_BASE.search = searchParams.toString();
-    const response = await fetch(API_BASE.toString(), {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      cache: 'default'
-    });
+		const response = await fetch(API_BASE.toString(), {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			cache: 'default'
+		});
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
 
-    const res = await response.json();
+		const res = await response.json();
 
-    const newManga = resultToManga(res.data) as Manga;
-    setLoading(false);
-    return newManga;
+		const newManga = resultToManga(res.data) as Manga;
+		setLoading(false);
+		return newManga;
 	};
 
-  const getChapters = (manga: Manga) => {
+	const getChapters = async (manga: Manga) => {
+		const API_BASE = new URL(`https://api.mangadex.org/manga/${manga.id}/feed`);
+		API_BASE.searchParams.append('translatedLanguage[]', 'en');
 
-  }
+		console.log('Sending request to: ', API_BASE.toString());
+
+		const response = await fetch(API_BASE.toString(), { method: 'GET' });
+
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+
+		const res = await response.json();
+
+		return resultToChapter(res.data);
+	};
 
 	const getRecent = async (amount: number = 60, pageNumber: number = 0): Promise<Array<Manga>> => {
 		setLoading(true);
@@ -140,14 +171,14 @@ export function useMangadex(): SourceBase {
 		const API_BASE = new URL('https://api.mangadex.org/manga');
 		const params = {
 			limit: amount.toString(),
-      offset: (amount * pageNumber).toString()
+			offset: (amount * pageNumber).toString()
 		};
 		const searchParams = new URLSearchParams();
-		['cover_art', 'author', 'artist'].forEach(include => {
-      searchParams.append('includes[]', include);
-    });
-    searchParams.append('limit', params.limit);
-    searchParams.append('offset', params.offset);
+		['cover_art', 'author', 'artist'].forEach((include) => {
+			searchParams.append('includes[]', include);
+		});
+		searchParams.append('limit', params.limit);
+		searchParams.append('offset', params.offset);
 
 		API_BASE.search = searchParams.toString();
 
@@ -166,9 +197,9 @@ export function useMangadex(): SourceBase {
 			const res = await response.json();
 
 			const newManga = resultToManga(res.data) as Array<Manga>;
-      setMangas(newManga);
+			setMangas(newManga);
 			setLoading(false);
-      return newManga;
+			return newManga;
 		} catch (error) {
 			console.error('Error:', error);
 
@@ -181,6 +212,6 @@ export function useMangadex(): SourceBase {
 		loading,
 		getManga,
 		getRecent,
-    getChapters
+		getChapters
 	};
 }

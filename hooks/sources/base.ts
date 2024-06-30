@@ -5,5 +5,5 @@ export interface SourceBase {
 	loading: boolean;
 	getManga(mangaId: uuid): Promise<Manga | null>;
 	getRecent(amount?: number, pageNumber?: number): Promise<Array<Manga>>;
-	getChapters(manga: Manga): any;
+	getChapters(manga: Manga): Promise<any>;
 }

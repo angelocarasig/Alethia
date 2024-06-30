@@ -9,7 +9,6 @@ import MangaCard from 'components/library/manga';
 import { Manga } from 'types/manga/manga';
 import { useMangadex } from 'hooks/sources/useMangadex';
 import { useManga } from 'hooks/useManga';
-import useDatabase from 'hooks/useDatabase';
 
 const styles = StyleSheet.create({
   container: {

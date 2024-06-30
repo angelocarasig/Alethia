@@ -1,7 +1,7 @@
 import { X } from '@tamagui/lucide-icons';
 import React, { useEffect, useState, useRef } from 'react';
 import { TextInput, Keyboard } from 'react-native';
-import { XStack, Input, Paragraph, AnimatePresence, View, Button } from 'tamagui';
+import { XStack, Input, Button } from 'tamagui';
 
 interface SearchInputProps {
   placeholder: string;

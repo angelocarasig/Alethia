@@ -48,7 +48,7 @@ const useMangaStore = create<DatabaseStore>((set, get) => {
 	const addToLibrary = (manga: Manga) => {
 		db.insert(mangaTable)
 			.values({
-				id: Crypto.randomUUID(),
+				id: manga.id,
 				mangaId: manga.id,
 				sourceId: manga.sourceId,
 				title: manga.title,

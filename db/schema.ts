@@ -20,4 +20,10 @@ export const mangaTable = sqliteTable('manga', {
 	coverUrl: text('cover_url'),
 });
 
+// export const chapterTable = sqliteTable('chapters', {
+// 	id: text('id').primaryKey(),
+// 	chapterId: text('id').notNull(),
+
+// })
+
 export type SelectManga = typeof mangaTable.$inferSelect;
